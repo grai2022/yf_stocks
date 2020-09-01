@@ -1,0 +1,1 @@
+module.exports.stockValidation = require('./stock.validation');
