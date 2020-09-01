@@ -6,8 +6,10 @@ const { stockService } = require('../services');
 
 
 const getNews = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['symbol']);
-  const result = await stockService.getNewsBySymbol(filter);
+  let result = false;
+  if(req && req.query && req.query.symbol){
+    result = await stockService.getNewsBySymbol(req.query.symbol);
+  }  
   if(!result){
     throw new ApiError(httpStatus.NOT_FOUND, 'Symbol Not Found');
   }
@@ -15,9 +17,13 @@ const getNews = catchAsync(async (req, res) => {
 });
 
 const getAnalysis = catchAsync(async (req, res) => {
-  const filter = pick(req.query, ['symbol']);
-  const result = await stockService.getAnalysisBySymbol(filter);
-  if (!result) {
+  let result = false;
+  console.log(req.query.symbol);
+  if(req && req.query && req.query.symbol){
+    result = await stockService.getAnalysisBySymbol(req.query.symbol);
+  }
+  
+  if(!result){
     throw new ApiError(httpStatus.NOT_FOUND, 'Symbol Not Found');
   }
   res.send(result);

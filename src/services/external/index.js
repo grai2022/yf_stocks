@@ -1,0 +1,1 @@
+module.exports.yahooService = require('./yahoo');
