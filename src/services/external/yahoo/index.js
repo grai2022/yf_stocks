@@ -1,6 +1,7 @@
 const ApiError = require('../../../utils/ApiError');
 const schema = require('./yahoo.schema');
 const request = require("request");
+const { report } = require('../../../app');
 
 
 /**
@@ -29,7 +30,10 @@ const getStockNews = async (symbol , region) => {
   }
   
   var options = await schema.getNewsOptions(symbol , region);
-  return _makeRequest(options);
+  return _makeRequest(options).then(
+    result => result,
+    error => false
+  );
   
 };
 //can be put in util or utils promisify could be used
@@ -38,8 +42,12 @@ const _makeRequest = async function(options){
     request(options, function (error, response, body) {
       if (error) {
        return reject(error);
+      }if(response && response.statusCode ==200){
+        return resolve(body);
+      }else{
+        return reject(false)
       }
-       return resolve(body);
+       
     });
   });
 }

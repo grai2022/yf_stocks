@@ -3,7 +3,7 @@ const ApiError = require('../utils/ApiError');
 const {yahooService} = require('./external');
 const NodeCache = require( "node-cache" );
 const myCache = new NodeCache({useClones:false});
-const {NEWSTTL,ANLYSISTTL} = require('./../config/config')
+const {NEWSTTL,ANLYSISTTL,APIERR} = require('./../config/config')
 
 /**
  * get stock analysis by symbol
@@ -15,7 +15,7 @@ const getAnalysisBySymbol = async (symbol) => {
 
   if ( cachedAnalysis == undefined ){
     let updatedAnalysis = await yahooService.getStockAnalysis(symbol);
-    myCache.set( _getKey("ANALYSIS+",symbol), updatedAnalysis , ANLYSISTTL)
+    updatedAnalysis ? myCache.set( _getKey("ANALYSIS+",symbol), updatedAnalysis , ANLYSISTTL) : APIERR
     return updatedAnalysis;
   } else{
     return cachedAnalysis;
@@ -30,14 +30,14 @@ const getAnalysisBySymbol = async (symbol) => {
  */
 const getNewsBySymbol = async (symbol, region) => {
   region = region || 'US';
-  let cachedAnalysis = myCache.get(_getKey("ANALYSIS+",symbol,region));
+  let cachedNews = myCache.get(_getKey("ANALYSIS+",symbol,region));
 
-  if ( cachedAnalysis == undefined ){
-    let updatedAnalysis = await yahooService.getStockNews(symbol, region);
-    myCache.set(_getKey("ANALYSIS+",symbol,region), updatedAnalysis , NEWSTTL)
-    return updatedAnalysis;
+  if ( cachedNews == undefined ){
+    let updatedNews = await yahooService.getStockNews(symbol, region);
+    updatedNews ? myCache.set( _getKey("ANALYSIS+",symbol), updatedNews , ANLYSISTTL) : APIERR
+    return updatedNews;
   } else{
-    return cachedAnalysis;
+    return cachedNews;
   }
 };
 
